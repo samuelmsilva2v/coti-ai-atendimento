@@ -1,0 +1,54 @@
+{
+  "name": "buscar_conhecimento",
+  "title": "Buscar conhecimento COTI",
+  "description": "Busca trechos da base de conhecimento oficial da COTI Informática semanticamente relacionados a uma pergunta. Retorna apenas trechos com similaridade acima do limiar configurado; lista vazia significa que não há evidência na base.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "pergunta": {
+        "type": "string",
+        "description": "Pergunta do aluno em linguagem natural.",
+        "minLength": 1,
+        "maxLength": 1000
+      },
+      "limite": {
+        "type": "integer",
+        "description": "Quantidade máxima de trechos a retornar.",
+        "minimum": 1,
+        "maximum": 10,
+        "default": 5
+      }
+    },
+    "required": ["pergunta"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "trechos": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "chunkId":      { "type": "string", "format": "uuid" },
+            "texto":        { "type": "string" },
+            "documentoId":  { "type": "string", "format": "uuid" },
+            "titulo":       { "type": "string" },
+            "fonte":        { "type": "string" },
+            "categoria":    { "type": "string", "enum": ["CURSO", "PROGRAMA", "TECNOLOGIA", "MODALIDADE", "PRE_REQUISITO", "INSTITUCIONAL"] },
+            "similaridade": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+          },
+          "required": ["chunkId", "texto", "documentoId", "titulo", "fonte", "categoria"]
+        }
+      },
+      "total": { "type": "integer", "minimum": 0 }
+    },
+    "required": ["trechos", "total"]
+  },
+  "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
+  }
+}

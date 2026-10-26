@@ -1,0 +1,3 @@
+# Scripts do Maven Wrapper: LF no Unix/Git Bash, CRLF no Windows (padrão do Spring Initializr).
+mvnw text eol=lf
+*.cmd text eol=crlf

@@ -1,0 +1,69 @@
+server:
+  port: 8082
+  address: ${SERVER_ADDRESS:127.0.0.1}
+  error:
+    include-stacktrace: never
+    include-message: never
+
+spring:
+  application:
+    name: api-atendimentos
+  threads:
+    virtual:
+      enabled: true
+  ai:
+    model:
+      embedding: none             # Art. 6: nenhum EmbeddingModel neste serviço
+      # Só o chat é usado; o starter da OpenAI criaria também estes modelos.
+      audio:
+        speech: none
+        transcription: none
+      image: none
+      moderation: none
+    openai:
+      api-key: ${OPENAI_API_KEY:}
+      # Cliente oficial da OpenAI (Spring AI 2.0): timeout por tentativa; max-retries=2 → até 3 tentativas.
+      timeout: ${OPENAI_CHAT_TIMEOUT:30s}
+      max-retries: 2
+      chat:
+        options:
+          model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
+          temperature: 0.0        # respostas factuais
+    mcp:
+      client:
+        name: api-atendimentos
+        version: 1.0.0
+        type: SYNC
+        request-timeout: ${MCP_REQUEST_TIMEOUT:10s}
+        initialized: false        # sobe mesmo com a api-conhecimento fora do ar; conexão preguiçosa
+        toolcallback:
+          enabled: false          # a ferramenta NÃO é entregue ao LLM: busca determinística (ADR-005)
+        streamable-http:
+          connections:
+            conhecimento:
+              url: ${MCP_CONHECIMENTO_URL:}
+              endpoint: /mcp
+
+coti:
+  atendimento:
+    # Mesmo valor da conexão MCP, validado aqui para falhar cedo e com mensagem clara se ausente.
+    mcp-conhecimento-url: ${spring.ai.mcp.client.streamable-http.connections.conhecimento.url:}
+    mensagem-fallback: "${ATENDIMENTO_MENSAGEM_FALLBACK:Não encontrei essa informação na base de conhecimento da COTI. Para dúvidas sobre esse assunto, entre em contato com o atendimento da COTI Informática.}"
+  rag:
+    top-k: ${RAG_TOP_K:5}
+    contexto-max-caracteres: ${RAG_CONTEXTO_MAX_CARACTERES:12000}
+
+logging:
+  structured:
+    format:
+      console: ${LOG_FORMAT:ecs}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: never
+      show-components: always

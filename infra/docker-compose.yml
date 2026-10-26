@@ -1,0 +1,28 @@
+# PostgreSQL 16 + pgvector para a api-conhecimento (specs/03-architecture.md, seção 9.1).
+# Uso, a partir da raiz do repositório:
+#   docker compose -f infra/docker-compose.yml --env-file .env up -d
+name: coti-ai-atendimento
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    # Só as variáveis do banco entram no container (sem env_file, para não expor a OPENAI_API_KEY).
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?defina POSTGRES_DB no .env}
+      POSTGRES_USER: ${POSTGRES_USER:?defina POSTGRES_USER no .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+    ports:
+      # Somente loopback: o banco não fica acessível pela rede local.
+      - "127.0.0.1:${POSTGRES_PORT:-5434}:5432"
+    volumes:
+      - coti-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  coti-pgdata:

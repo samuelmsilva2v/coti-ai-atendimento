@@ -1,0 +1,86 @@
+server:
+  port: 8081
+  address: ${SERVER_ADDRESS:127.0.0.1}
+  error:
+    include-stacktrace: never
+    include-message: never
+
+spring:
+  application:
+    name: api-conhecimento
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5434}/${POSTGRES_DB:coti_ai}
+    username: ${POSTGRES_USER:}
+    password: ${POSTGRES_PASSWORD:}
+    hikari:
+      connection-timeout: 5000 # ms (propriedade numérica do HikariCP)
+  ai:
+    model:
+      chat: none # este serviço só gera embeddings (Art. 6)
+      # O starter da OpenAI criaria também estes modelos, que o serviço não usa.
+      audio:
+        speech: none
+        transcription: none
+      image: none
+      moderation: none
+    openai:
+      api-key: ${OPENAI_API_KEY:}
+      # Cliente oficial da OpenAI (Spring AI 2.0): timeout por tentativa; max-retries=2 → até 3 tentativas (RNF04.3).
+      timeout: ${OPENAI_EMBEDDING_TIMEOUT:15s}
+      max-retries: 2
+      embedding:
+        options:
+          model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
+          dimensions: 1536
+    vectorstore:
+      pgvector:
+        initialize-schema: false # esquema vem do Flyway (V3__vector_store.sql)
+        schema-validation: true
+        dimensions: 1536
+        distance-type: COSINE_DISTANCE
+        index-type: HNSW
+    mcp:
+      server:
+        protocol: STREAMABLE # SSE está depreciado no 2.0; STDIO não é usado entre serviços
+        name: api-conhecimento
+        version: 1.0.0
+        type: SYNC
+        instructions: "Busca semântica na base de conhecimento oficial da COTI Informática."
+        capabilities:
+          tool: true
+          resource: false
+          prompt: false
+          completion: false
+        streamable-http:
+          mcp-endpoint: /mcp
+
+springdoc:
+  paths-to-exclude: /mcp/**
+
+coti:
+  admin:
+    # Vazio quando ausente, para que a validação de AdminProperties impeça a inicialização.
+    token: ${ADMIN_API_TOKEN:}
+  chunking:
+    tamanho-tokens: ${CHUNK_SIZE:800}
+    sobreposicao-tokens: ${CHUNK_OVERLAP:100}
+  rag:
+    limiar-similaridade: ${RAG_SIMILARITY_THRESHOLD:0.70}
+
+logging:
+  structured:
+    format:
+      console: ${LOG_FORMAT:ecs}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: never
+      show-components: always
