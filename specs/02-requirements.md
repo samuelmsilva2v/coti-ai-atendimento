@@ -68,7 +68,7 @@ variável de ambiente.
 | Tamanho do chunk | 800 tokens |
 | Sobreposição entre chunks | 100 tokens |
 | `topK` padrão / máximo | 5 / 10 |
-| Limiar de similaridade | 0,70 |
+| Limiar de similaridade | 0,38 (calibrado na T064; valor inicial era 0,70) |
 | Tamanho máximo do contexto RAG | 12.000 caracteres |
 | Timeout da chamada MCP | 10 s |
 | Timeout da chamada à OpenAI (chat) | 30 s |
@@ -904,6 +904,6 @@ Variáveis previstas, das quais algumas já existem em `.env.example`:
 
 - Formato de erro: **decidido**, Problem Details (RFC 9457); ver `06-api-contracts.md`, seção 2.
 - Valores definitivos de modelos, dimensão, limiar e timeouts: a decidir em `03-architecture.md`.
-  O limiar de 0,70 deve ser calibrado com um conjunto de perguntas de referência.
+  O limiar foi calibrado em 0,38 com 21 perguntas de referência (T064, ADR-014).
 - Texto definitivo da mensagem de fallback e do canal de atendimento humano indicado: a validar
   com a COTI.

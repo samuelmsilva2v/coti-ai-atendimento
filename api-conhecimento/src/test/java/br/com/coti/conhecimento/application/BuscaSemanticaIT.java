@@ -21,7 +21,7 @@ import static br.com.coti.conhecimento.support.BaseDeTeste.limpar;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
-/** Busca vetorial real no pgvector (cosseno + limiar 0,70) com embeddings determinísticos. */
+/** Busca vetorial real no pgvector (cosseno + limiar padrão 0,38) com embeddings determinísticos. */
 @IntegrationTest
 class BuscaSemanticaIT {
 
@@ -60,7 +60,7 @@ class BuscaSemanticaIT {
         assertThat(primeiro.fonte()).isEqualTo("https://www.cotiinformatica.com.br/curso-java-web-developer");
         assertThat(primeiro.categoria()).isNotNull();
         assertThat(primeiro.chunkId()).isNotNull();
-        assertThat(resultado.limiarSimilaridade()).isEqualTo(0.70);
+        assertThat(resultado.limiarSimilaridade()).isEqualTo(0.38);
     }
 
     @Test
@@ -91,7 +91,7 @@ class BuscaSemanticaIT {
     @Test
     void nadaAbaixoDoLimiarEDevolvido() {   // RN04.1
         assertThat(busca.buscar(ConsultaBusca.de(PERGUNTA_JAVA, 10)).trechos())
-                .allSatisfy(t -> assertThat(t.similaridade()).isGreaterThanOrEqualTo(0.70))
+                .allSatisfy(t -> assertThat(t.similaridade()).isGreaterThanOrEqualTo(0.38))
                 .noneMatch(t -> t.texto().equals(NUTRICAO));
     }
 

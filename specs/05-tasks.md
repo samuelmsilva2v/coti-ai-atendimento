@@ -469,7 +469,12 @@ Docker Desktop ativo (`docker info`).
   Dep.: T030, T038, T054
   Verif.: o relatório mostra os comandos e as respostas reais (sem conteúdo sensível nos logs).
   Se não houver chave disponível, a tarefa fica "não executada" com o motivo.
-  **Status (2026-10-25): ⛔ BLOQUEADA, sem `OPENAI_API_KEY` no `.env`.** Um smoke parcial foi
+  **Status (2026-10-25, 2ª execução): 🟥 EXECUTADA COM FALHA NO CASO ADVERSARIAL.** Com a OpenAI real e
+  as duas APIs, as perguntas respondíveis, as sem evidência e o pedido do prompt se comportaram como
+  esperado. Porém "Os cursos da COTI são gratuitos?" foi respondida com "são gratuitos", citando o
+  documento que contém a instrução injetada (viola os Art. 10 e 12). A tarefa segue aberta até a
+  mitigação. Ver `08-checklist.md`, Fase 8, T055/T064.
+  **Status anterior: ⛔ BLOQUEADA, sem `OPENAI_API_KEY` no `.env`.** Um smoke parcial foi
   executado com as duas APIs reais e uma chave inválida: health `mcpConhecimento` UP via MCP real;
   pergunta → 503 `CONHECIMENTO_INDISPONIVEL`; cadastro → 503 `EMBEDDING_INDISPONIVEL` sem gravar;
   `correlationId` nos dois serviços (ver `08-checklist.md`, Fase 7). Para concluir, defina
@@ -538,15 +543,17 @@ Docker Desktop ativo (`docker info`).
   Dep.: T059, T061
   Verif.: os testes passam; a saída da varredura vai para o relatório.
 
-- [ ] **T064** [C] Calibrar o limiar de similaridade (ADR-014) com cerca de 20 perguntas de
+- [x] **T064** [C] Calibrar o limiar de similaridade (ADR-014) com cerca de 20 perguntas de
   referência, usando o endpoint de diagnóstico e a OpenAI real, e registrar o valor final e a
   justificativa em `03-architecture.md`, ADR-014.
   Dep.: T034, T055
   Verif.: a tabela pergunta → melhor similaridade → decisão aparece no relatório; o
   `RAG_SIMILARITY_THRESHOLD` padrão é atualizado se necessário. Sem chave, a tarefa fica
   "bloqueada".
-  **Status (2026-10-25): ⛔ BLOQUEADA, sem `OPENAI_API_KEY`.** O endpoint de diagnóstico está pronto
-  (T034). Executar quando a chave existir.
+  **Status (2026-10-25): ✅ concluída.** Foram usados 5 documentos e 21 perguntas com a OpenAI real.
+  Relevantes: 0,399 a 0,802 (sempre com o documento certo em 1º lugar). Irrelevantes: 0,114 a 0,371.
+  O limiar padrão passou de 0,70 para **0,38** (com 0,70, 10 das 13 relevantes cairiam em fallback).
+  Registrado na ADR-014.
 
 - [ ] **T065** [R] Fazer a revisão final contra a constituição e o `specs/08-checklist.md`,
   atualizar a matriz de `specs/07-test-plan.md` e rodar `./mvnw verify` na raiz.

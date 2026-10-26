@@ -5,7 +5,7 @@ import jakarta.validation.constraints.DecimalMin;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-/** Limiar de similaridade da busca (RAG_SIMILARITY_THRESHOLD; calibrar conforme ADR-014). */
+/** Limiar de similaridade da busca (RAG_SIMILARITY_THRESHOLD; padrão 0,38 calibrado na T064, ADR-014). */
 @Validated
 @ConfigurationProperties("coti.rag")
 public record RagProperties(

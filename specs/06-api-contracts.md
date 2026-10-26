@@ -354,7 +354,7 @@ calibrar o limiar e a verificar a ingestão. Executa **a mesma** consulta da fer
     }
   ],
   "total": 1,
-  "limiarSimilaridade": 0.70
+  "limiarSimilaridade": 0.38
 }
 ```
 
@@ -864,7 +864,7 @@ interno, que **não** é exposto na API:
 | Variável | Serviço | Padrão | Uso |
 |---|---|---|---|
 | `ADMIN_API_TOKEN` | conhecimento | — (obrigatória) | Token de `/api/conhecimentos/**`. |
-| `RAG_SIMILARITY_THRESHOLD` | conhecimento | `0.70` | Limiar da busca (MCP e diagnóstico). |
+| `RAG_SIMILARITY_THRESHOLD` | conhecimento | `0.38` | Limiar da busca (MCP e diagnóstico). |
 | `MCP_CONHECIMENTO_URL` | atendimentos | — (obrigatória), ex.: `http://localhost:8081` (endpoint `/mcp`) | Base do MCP Server. |
 | `MCP_REQUEST_TIMEOUT` | atendimentos | `10s` | Timeout de cada chamada MCP. |
 | `RAG_TOP_K` | atendimentos | `5` | `limite` enviado à ferramenta (de 1 a 10). |

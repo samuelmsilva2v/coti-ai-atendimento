@@ -377,7 +377,7 @@ coti:
     tamanho-tokens: ${CHUNK_SIZE:800}
     sobreposicao-tokens: ${CHUNK_OVERLAP:100}
   rag:
-    limiar-similaridade: ${RAG_SIMILARITY_THRESHOLD:0.70}
+    limiar-similaridade: ${RAG_SIMILARITY_THRESHOLD:0.38}
     top-k-padrao: 5
     top-k-maximo: 10
 
@@ -756,7 +756,7 @@ derivação de fontes seguem `06-api-contracts.md`, seção 6.
 | `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` | conhecimento / compose | ✔ | — |
 | `ADMIN_API_TOKEN` | conhecimento | ✔ | — |
 | `CHUNK_SIZE`, `CHUNK_OVERLAP` | conhecimento | | `800`, `100` |
-| `RAG_SIMILARITY_THRESHOLD` | conhecimento | | `0.70` |
+| `RAG_SIMILARITY_THRESHOLD` | conhecimento | | `0.38` (calibrado, ADR-014) |
 | `MCP_CONHECIMENTO_URL` | atendimentos | ✔ | — (local: `http://localhost:8081`) |
 | `MCP_REQUEST_TIMEOUT` | atendimentos | | `10s` |
 | `RAG_TOP_K` | atendimentos | | `5` |
@@ -817,7 +817,7 @@ Desktop ativo.
 | **ADR-011** Erros RFC 9457 | `ProblemDetail` nativo do Spring, com extensões. | Formato próprio. | Padrão de mercado, com suporte nativo e documentado no OpenAPI. |
 | **ADR-012** Apenas o PostgreSQL em container | As aplicações rodam na JVM local. | Compose com as três peças. | Ciclo de desenvolvimento mais rápido. A conteinerização das aplicações fica pós-MVP. |
 | **ADR-013** ArchUnit para camadas e proibições | Testes de arquitetura em cada serviço. | Só revisão manual. | As regras da constituição viram testes que falham no build. |
-| **ADR-014** Limiar de similaridade 0,70 com calibração obrigatória | O valor inicial do spec é configurável. | — | **Risco:** o `text-embedding-3-small` tende a produzir similaridades de cosseno menores; 0,70 pode gerar fallback em excesso. Antes da entrega, o limiar é calibrado com um conjunto de perguntas de referência usando o endpoint de diagnóstico, e o valor final é registrado aqui. |
+| **ADR-014** Limiar de similaridade calibrado em **0,38** | O valor inicial era 0,70. Na calibração (T064, 2026-10-25, `text-embedding-3-small`, 5 documentos e 21 perguntas), as 13 relevantes ficaram entre 0,399 e 0,802, sempre com o documento certo em 1º lugar, e as 8 irrelevantes entre 0,114 e 0,371. Com 0,70, 10 das 13 relevantes cairiam em fallback. O valor 0,38 separa os dois grupos. | Manter 0,70 (fallback em excesso); 0,40 (perderia a pergunta de frequência, 0,399). | A margem é estreita (0,371 a 0,399). O valor foi puxado para o lado da cobertura porque um falso positivo ainda passa pelo modelo (`respondida=false`) e pelo `VerificadorDeResposta`. **Recalibrar** com o endpoint de diagnóstico quando a base real crescer. |
 | **ADR-015** Verificação determinística da resposta | Depois da derivação das fontes, o `VerificadorDeResposta` (domínio) substitui a resposta pelo fallback se ela contiver um valor (R$, %, data, horário) ausente dos trechos citados, ou uma linha do prompt de sistema (contrato, seção 6.4, item 7; RN08.6). | Confiar só no prompt de sistema. | O Art. 12 e a RN08.4 deixam de depender só da obediência do modelo. Pode gerar fallback em excesso quando o modelo reformula um valor (ex.: "19h" na fonte e "19:00" na resposta): é o lado seguro da troca, e deve ser observado na T055. |
 
 ---
@@ -830,5 +830,5 @@ Desktop ativo.
 | `outputSchema` e `annotations` gerados pelo `@McpTool` | Comparar no teste de contrato. Se divergirem, usar o registro programático (seção 5.5). |
 | DDL da `vector_store` esperado pelo `PgVectorStore` 2.0.1 | Conferir antes de escrever a `V3`, com `vector-table-validations-enabled` ligado no teste. |
 | Propagação do `_meta` e leitura via `McpMeta` | Validar no teste de integração. A alternativa é um cabeçalho HTTP no transporte. |
-| Limiar 0,70 | Calibração (ADR-014). |
+| Limiar | ✅ Calibrado em 0,38 (ADR-014, T064). Recalibrar quando a base real crescer. |
 | Patch exato do Boot 4.1 e do springdoc 3.x | Fixar no scaffold e registrar na seção 2. |

@@ -80,7 +80,7 @@ class BuscarConhecimentoToolIT {
         assertThat(primeiro.get("fonte").asString()).isNotBlank();
         assertThat(primeiro.get("categoria").asString()).isEqualTo("CURSO");
         assertThat(primeiro.get("chunkId").asString()).hasSize(36);
-        assertThat(primeiro.get("similaridade").asDouble()).isGreaterThanOrEqualTo(0.70);
+        assertThat(primeiro.get("similaridade").asDouble()).isGreaterThanOrEqualTo(0.38);
         assertThat(primeiro.has("embedding")).isFalse();
 
         String texto = ((TextContent) resultado.content().getFirst()).text();

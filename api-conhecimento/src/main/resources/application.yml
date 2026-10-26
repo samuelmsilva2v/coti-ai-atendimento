@@ -68,7 +68,7 @@ coti:
     tamanho-tokens: ${CHUNK_SIZE:800}
     sobreposicao-tokens: ${CHUNK_OVERLAP:100}
   rag:
-    limiar-similaridade: ${RAG_SIMILARITY_THRESHOLD:0.70}
+    limiar-similaridade: ${RAG_SIMILARITY_THRESHOLD:0.38} # calibrado na T064 (ADR-014)
 
 logging:
   structured:
